@@ -1,10 +1,30 @@
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
-*.joblib
+
+# Data directories (keep directory structure, exclude large datasets from git if desired)
+data/raw/*.csv
+data/processed/*.csv
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# Environment & IDE
 .env
 .venv
 env/
 venv/
+ENV/
 .idea/
 .vscode/
+
+# Generated figures and reports
+reports/figures/*.png
+!reports/figures/.gitkeep
+
+# OS generated
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
