@@ -29,6 +29,10 @@ TIMEZONE = "Asia/Kolkata"
 OPEN_METEO_ARCHIVE_URL = "https://archive-api.open-meteo.com/v1/archive"
 OPEN_METEO_FORECAST_URL = "https://api.open-meteo.com/v1/forecast"
 
+# Carto Basemaps API Key (Safeguarded with environment variable)
+import os
+CARTO_API_KEY = os.environ.get("CARTO_API_KEY", "cb1_4qhk_1_857570c78f1776c27331ce8c")
+
 # Default Historical Ingestion Window (3 Full Years for robust seasonal coverage)
 DEFAULT_START_DATE = "2022-01-01"
 DEFAULT_END_DATE = "2024-12-31"

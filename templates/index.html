@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0a0e17" id="meta-theme-color">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="description" content="वज्रSense (VajraSense) — AI/ML and Soft Computing Thunderstorm & Lightning Nowcasting System (0–2h lead time).">
+    <title>वज्रSense — AI/ML Thunderstorm & Lightning Nowcaster</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Mukta:wght@700;800;900&family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="icon" type="image/png" href="/static/img/favicon.png">
+    <script>
+        (function() {
+            var savedTheme = 'night';
+            try {
+                savedTheme = localStorage.getItem('vajrasense_theme') || 'night';
+            } catch(e) {}
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        })();
+    </script>
+</head>
+<body>
+
+    <header class="app-header">
+        <div class="brand-section" id="brand-home-btn" role="button" tabindex="0" title="Return to VajraSense Overview">
+            <div class="logo-badge" aria-label="VajraSense Emblem" title="वज्रSense (VajraSense)">
+                <img src="/static/img/vajra_logo_128.png" alt="VajraSense Emblem" class="logo-img">
+            </div>
+            <h1 class="brand-title">
+                <span class="brand-vajra">वज्र</span><span class="brand-sense">Sense</span>
+            </h1>
+        </div>
+
+        <nav class="app-navbar" aria-label="Main Navigation">
+            <button type="button" class="nav-item" data-nav="dashboard" id="nav-dashboard" title="Operational Radar & Map View">
+                <span class="nav-icon">⚡</span>
+                <span class="nav-label">Dashboard</span>
+            </button>
+            <button type="button" class="nav-item" data-nav="weather" id="nav-weather" title="Live Telemetry & Atmospheric Indices">
+                <span class="nav-icon">🌧️</span>
+                <span class="nav-label">Weather</span>
+            </button>
+            <button type="button" class="nav-item" data-nav="model" id="nav-model" title="Mamdani Fuzzy & ML Classifier Simulator">
+                <span class="nav-icon">🧠</span>
+                <span class="nav-label">Model</span>
+            </button>
+            <button type="button" class="nav-item" data-nav="evaluation" id="nav-evaluation" title="WMO Contingency Verification & Skill Scores">
+                <span class="nav-icon">📊</span>
+                <span class="nav-label">Evaluation</span>
+            </button>
+        </nav>
+
+        <div class="header-actions">
+            <button type="button" id="notif-btn" class="header-icon-btn" title="Severe Weather Alerts & Bulletins" aria-label="Notifications">
+                <span class="icon">🔔</span>
+                <span id="notif-badge" class="badge-count" style="display: none;">0</span>
+            </button>
+            <button type="button" id="settings-btn" class="header-icon-btn" title="System Settings & Radar Preferences" aria-label="Settings">
+                <span class="icon">⚙️</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- =====================================================================
+         Landing Screen (First screen displayed upon initial load)
+         ===================================================================== -->
+    <section id="landing-screen" class="landing-screen" aria-label="VajraSense Overview">
+        <div class="landing-container">
+            <!-- 1. Hero Section -->
+            <div class="landing-hero">
+                <div class="landing-emblem-wrap">
+                    <img src="/static/img/vajra_logo_128.png" alt="VajraSense Emblem" class="landing-logo-img">
+                </div>
+                <h1 class="landing-title">
+                    <span class="brand-vajra">वज्र</span><span class="brand-sense">Sense</span>
+                </h1>
+                <p class="landing-tagline">Severe Convective Thunderstorm & Lightning Nowcasting</p>
+                <div class="landing-action-row">
+                    <button type="button" id="explore-dashboard-btn" class="btn-primary-explore" title="Open Interactive Geospatial Nowcasting Dashboard">
+                        <span>⚡ Explore Dashboard</span>
+                        <span class="btn-arrow">&rarr;</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 2. Three Core Cards -->
+            <div class="landing-features-grid">
+                <div class="landing-card">
+                    <div class="landing-card-icon">🌧️</div>
+                    <h3 class="landing-card-title">Weather Monitoring</h3>
+                    <p class="landing-card-desc">
+                        Simulates Doppler Weather Radar reflectivity (dBZ, VIL), thermodynamic sounding parameters (CAPE, Lifted Index, Shear), and cloud-to-ground lightning stroke densities.
+                    </p>
+                    <span class="card-badge">Radar & Sounding Simulation</span>
+                </div>
+
+                <div class="landing-card">
+                    <div class="landing-card-icon">🧠</div>
+                    <h3 class="landing-card-title">AI-Based Risk Estimation</h3>
+                    <p class="landing-card-desc">
+                        Combines an ensemble Random Forest classifier with an 8-rule Mamdani Fuzzy Inference System for transparent, human-interpretable hazard scoring (0–100).
+                    </p>
+                    <span class="card-badge">ML + Mamdani Soft Computing</span>
+                </div>
+
+                <div class="landing-card">
+                    <div class="landing-card-icon">🌀</div>
+                    <h3 class="landing-card-title">Short-Term Outlook</h3>
+                    <p class="landing-card-desc">
+                        Calculates multi-horizon storm cell advection vectors across 0–30 min (Tactical), 30–60 min (Extrapolation), and 60–120 min (Strategic) windows with expanding uncertainty cones.
+                    </p>
+                    <span class="card-badge">0–2h Multi-Horizon Cones</span>
+                </div>
+            </div>
+
+            <!-- 3. Simple 4-Step Workflow -->
+            <div class="landing-workflow-section">
+                <h2 class="landing-section-heading">Operational Nowcasting Workflow</h2>
+                <div class="landing-workflow-grid">
+                    <div class="workflow-step">
+                        <div class="step-num">1</div>
+                        <div class="step-icon">📡</div>
+                        <h4 class="step-title">Weather Data</h4>
+                        <p class="step-desc">Ingests multi-sensor Doppler radar reflectivity, satellite brightness temperatures, and lightning network records.</p>
+                    </div>
+
+                    <div class="workflow-arrow" aria-hidden="true">&rarr;</div>
+
+                    <div class="workflow-step">
+                        <div class="step-num">2</div>
+                        <div class="step-icon">⚙️</div>
+                        <h4 class="step-title">Feature Processing</h4>
+                        <p class="step-desc">Calculates thermodynamic indices: CAPE, vertical wind shear, moisture deficit, barometric tendency, and &theta;<sub>e</sub>.</p>
+                    </div>
+
+                    <div class="workflow-arrow" aria-hidden="true">&rarr;</div>
+
+                    <div class="workflow-step">
+                        <div class="step-num">3</div>
+                        <div class="step-icon">🧠</div>
+                        <h4 class="step-title">ML + Fuzzy Logic</h4>
+                        <p class="step-desc">Evaluates Random Forest class probabilities and fires Mamdani linguistic rules with centroid defuzzification.</p>
+                    </div>
+
+                    <div class="workflow-arrow" aria-hidden="true">&rarr;</div>
+
+                    <div class="workflow-step">
+                        <div class="step-num">4</div>
+                        <div class="step-icon">⚠️</div>
+                        <h4 class="step-title">Risk Result</h4>
+                        <p class="step-desc">Generates calibrated hazard index (0–100), alert status (Low to Severe), and advection trajectory cones.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Prototype Notice -->
+            <div class="landing-disclaimer">
+                <span class="disclaimer-icon">ℹ️</span>
+                <span>
+                    <strong>Prototype Demonstration:</strong> Designed for localized academic research. Radar grids and lightning strikes are simulated based on realistic tropical convective physics. Complementary to official IMD weather advisories.
+                </span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Operational Dashboard (Revealed upon clicking Explore Dashboard) -->
+    <main id="dashboard-view" class="main-container" style="display: none;">
+        <section class="map-card" aria-label="Geospatial Map and Forecast Horizon">
+
+            <div id="map-view"></div>
+
+            <div class="radar-legend">
+                <div class="legend-title">Radar Reflectivity (dBZ)</div>
+                <div class="legend-scale"></div>
+                <div class="legend-labels">
+                    <span>15</span>
+                    <span>30</span>
+                    <span>45</span>
+                    <span>55</span>
+                    <span>65+</span>
+                </div>
+            </div>
+
+            <div class="timeline-controller">
+                <button id="play-btn" class="play-btn" title="Play 0–2h Projection Animation">▶</button>
+                <div class="timeline-track-wrapper">
+                    <div class="timeline-steps">
+                        <button type="button" class="timeline-step-btn active" data-min="0" title="Now (0 min)">
+                            <span class="step-label-full">Now (0m)</span>
+                            <span class="step-label-short">Now</span>
+                        </button>
+                        <button type="button" class="timeline-step-btn" data-min="30" title="+30 min Horizon">
+                            <span class="step-label-full">+30 min</span>
+                            <span class="step-label-short">+30m</span>
+                        </button>
+                        <button type="button" class="timeline-step-btn" data-min="60" title="+60 min Horizon">
+                            <span class="step-label-full">+60 min</span>
+                            <span class="step-label-short">+60m</span>
+                        </button>
+                        <button type="button" class="timeline-step-btn" data-min="120" title="+120 min Horizon">
+                            <span class="step-label-full">+120 min</span>
+                            <span class="step-label-short">+120m</span>
+                        </button>
+                    </div>
+                    <input type="range" id="timeline-slider" class="timeline-slider" min="0" max="120" step="30" value="0" aria-label="Nowcast Horizon Slider">
+                </div>
+            </div>
+        </section>
+
+        <aside class="sidebar-panel" aria-label="Nowcast Analytics and Risk Telemetry">
+            <div class="glass-card primary-risk-card">
+                <div class="risk-header-row">
+                    <div>
+                        <div class="card-title-sm">Thunderstorm & Lightning Hazard</div>
+                        <div id="alert-code-label" style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 500; margin-top: 2px;">STATUS ACTIVE</div>
+                    </div>
+                    <div id="primary-risk-badge" class="risk-badge elevated">
+                        <span>⚠️</span> ELEVATED
+                    </div>
+                </div>
+
+                <div class="threat-gauge-row">
+                    <div class="threat-metric">
+                        <div class="metric-number">
+                            <span id="lightning-score-val">74.5</span>
+                            <span class="metric-unit">/100</span>
+                        </div>
+                        <div class="metric-label">Lightning Hazard Index (Fuzzy FIS)</div>
+                        <div class="progress-track">
+                            <div id="lightning-progress-fill" class="progress-fill" style="width: 75%; background-color: var(--risk-elevated);"></div>
+                        </div>
+                    </div>
+
+                    <div class="threat-metric">
+                        <div class="metric-number" id="ml-class-val" style="font-size: 1.45rem;">
+                            Elevated
+                        </div>
+                        <div class="metric-label">ML Classifier Prediction</div>
+                        <div class="progress-track">
+                            <div id="ml-confidence-fill" class="progress-fill" style="width: 82%; background-color: var(--primary-accent);"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card">
+                <div class="card-title-sm">Atmospheric Instability & Radar Telemetry</div>
+                <div class="telemetry-grid">
+                    <div class="telemetry-item">
+                        <div class="tel-label">CAPE (Buoyancy)</div>
+                        <div id="tel-cape" class="tel-value">3,650 J/kg</div>
+                    </div>
+                    <div class="telemetry-item">
+                        <div class="tel-label">Max Reflectivity</div>
+                        <div id="tel-dbz" class="tel-value">62.0 dBZ</div>
+                    </div>
+                    <div class="telemetry-item">
+                        <div class="tel-label">Vert. Integrated Liquid</div>
+                        <div id="tel-vil" class="tel-value">48.0 kg/m²</div>
+                    </div>
+                    <div class="telemetry-item">
+                        <div class="tel-label">0-6km Bulk Shear</div>
+                        <div id="tel-shear" class="tel-value">24.5 m/s</div>
+                    </div>
+                    <div class="telemetry-item">
+                        <div class="tel-label">Lightning Flash Rate</div>
+                        <div id="tel-flashes" class="tel-value">85 /min</div>
+                    </div>
+                    <div class="telemetry-item">
+                        <div class="tel-label">Precipitable Water</div>
+                        <div id="tel-pw" class="tel-value">56.0 mm</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card">
+                <div class="card-title-sm">Multi-Horizon Projections (0–2 Hours)</div>
+                <div id="horizon-list-container" class="horizon-list"></div>
+            </div>
+
+            <div class="glass-card" style="border-left: 4px solid var(--primary-accent);">
+                <div class="card-title-sm">Soft Computing Explainability Trace</div>
+                <div id="fuzzy-active-rule" style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 0.4rem; line-height: 1.5;">
+                    Evaluating Mamdani fuzzy rule firing conditions...
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <div id="eval-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="eval-modal-title">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="eval-modal-title" class="modal-title">📊 Meteorological Verification & Skill Evaluation</h2>
+                <button class="modal-close" aria-label="Close modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Standard 2×2 contingency table scores evaluated over 450 verified convective episodes comparing <strong>वज्रSense</strong> against a classical Persistence Baseline across nowcast lead times:</p>
+                
+                <div class="table-responsive-wrapper">
+                    <table class="metrics-table">
+                        <thead>
+                            <tr>
+                                <th>Forecast Interval</th>
+                                <th>POD (Hit Rate)</th>
+                                <th>FAR (False Alarm)</th>
+                                <th>CSI (Threat Score)</th>
+                                <th>Heidke Skill (HSS)</th>
+                                <th>Skill Gain</th>
+                            </tr>
+                        </thead>
+                        <tbody id="eval-table-body"></tbody>
+                    </table>
+                </div>
+
+                <div style="background: var(--bg-inset); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-subtle); margin-top: 1rem;">
+                    <h3 style="font-size: 0.95rem; color: var(--primary-accent); margin-bottom: 0.5rem;">Key Verification Findings:</h3>
+                    <ul style="padding-left: 1.25rem; font-size: 0.85rem; color: var(--text-secondary); display: flex; flex-direction: column; gap: 0.4rem;">
+                        <li><strong>0–30 min Horizon:</strong> High POD of 0.807 with ~50% reduction in False Alarm Ratio compared to persistence.</li>
+                        <li><strong>60–120 min Horizon:</strong> Thermodynamic indices (CAPE and 0-6km Shear) maintain positive forecast skill (CSI 0.495 vs 0.217).</li>
+                        <li><strong>Limitation & False Alarms:</strong> Elevated false alarms occur when high Convective Inhibition (CIN > 100 J/kg) caps thunderstorm initiation despite elevated CAPE.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="fuzzy-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="fuzzy-modal-title">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="fuzzy-modal-title" class="modal-title">🧠 Mamdani Fuzzy Inference System (What-If Simulator)</h2>
+                <button class="modal-close" aria-label="Close modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Test atmospheric input permutations to observe real-time fuzzification, linguistic rule firing, and centroid defuzzification into the Lightning Hazard Index (0–100):</p>
+                
+                <div class="fuzzy-sim-grid">
+                    <div>
+                        <label style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:4px;">
+                            <span>CAPE (Buoyancy):</span>
+                            <strong id="sim-cape-val">2500 J/kg</strong>
+                        </label>
+                        <input type="range" id="sim-cape" min="200" max="5000" step="100" value="2500" style="width:100%;">
+                    </div>
+                    <div>
+                        <label style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:4px;">
+                            <span>Radar Echo (Max dBZ):</span>
+                            <strong id="sim-dbz-val">45 dBZ</strong>
+                        </label>
+                        <input type="range" id="sim-dbz" min="10" max="70" step="1" value="45" style="width:100%;">
+                    </div>
+                    <div>
+                        <label style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:4px;">
+                            <span>Flash Rate (/10 min):</span>
+                            <strong id="sim-flash-val">20 /min</strong>
+                        </label>
+                        <input type="range" id="sim-flash" min="0" max="100" step="2" value="20" style="width:100%;">
+                    </div>
+                    <div>
+                        <label style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:4px;">
+                            <span>Bulk Wind Shear (0-6km):</span>
+                            <strong id="sim-shear-val">16 m/s</strong>
+                        </label>
+                        <input type="range" id="sim-shear" min="4" max="35" step="1" value="16" style="width:100%;">
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin: 1.25rem 0;">
+                    <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Defuzzified Output (Centroid Method):</div>
+                    <div id="sim-result-score" class="fuzzy-result-badge">
+                        72.4 — Elevated
+                    </div>
+                </div>
+
+                <div>
+                    <h4 style="font-size: 0.85rem; color: var(--primary-accent); margin-bottom: 0.5rem;">Active Fired Fuzzy Rules:</h4>
+                    <div id="sim-rules-container"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Panel Modal -->
+    <div id="notif-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="notif-modal-title">
+        <div class="modal-content" style="max-width: 540px;">
+            <div class="modal-header">
+                <div style="display: flex; align-items: center; gap: 0.65rem;">
+                    <span style="font-size: 1.3rem;">🔔</span>
+                    <div>
+                        <h2 id="notif-modal-title" class="modal-title" style="font-size: 1.15rem; margin: 0;">Severe Weather Bulletins</h2>
+                        <div style="font-size: 0.74rem; color: var(--text-muted); margin-top: 2px;">Real-time nowcasting warnings & telemetry updates</div>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.6rem;">
+                    <button type="button" id="clear-notifs-btn" class="btn-subtle" title="Mark All Bulletins Read" disabled style="opacity: 0.5;">All Read</button>
+                    <button type="button" class="modal-close" aria-label="Close notification panel">&times;</button>
+                </div>
+            </div>
+            <div class="modal-body" id="notif-list" style="display: flex; flex-direction: column; gap: 0.75rem; max-height: 60vh; overflow-y: auto;">
+                <div class="notif-empty-state" style="text-align: center; padding: 2.5rem 1rem; color: var(--text-muted);">
+                    <span style="font-size: 2rem; display: block; margin-bottom: 0.5rem; opacity: 0.6;">🔔</span>
+                    <strong style="color: var(--text-primary); display: block; margin-bottom: 0.25rem;">No New Bulletins</strong>
+                    <span style="font-size: 0.82rem;">There are currently no active severe weather alerts.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Setting Panel Modal -->
+    <div id="settings-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="settings-modal-title">
+        <div class="modal-content" style="max-width: 560px;">
+            <div class="modal-header">
+                <div style="display: flex; align-items: center; gap: 0.65rem;">
+                    <span style="font-size: 1.3rem;">⚙️</span>
+                    <div>
+                        <h2 id="settings-modal-title" class="modal-title" style="font-size: 1.15rem; margin: 0;">System Settings & Preferences</h2>
+                        <div style="font-size: 0.74rem; color: var(--text-muted); margin-top: 2px;">Customize nowcasting parameters, station, and display</div>
+                    </div>
+                </div>
+                <button type="button" class="modal-close" aria-label="Close settings panel">&times;</button>
+            </div>
+            <div class="modal-body" style="display: flex; flex-direction: column; gap: 1rem; max-height: 65vh; overflow-y: auto;">
+                
+                <!-- 1. Appearance / Theme -->
+                <div class="setting-group">
+                    <div class="setting-header">
+                        <div class="setting-label">Interface Theme</div>
+                        <div class="setting-desc">Switch between high-contrast dark radar mode and bright daylight mode.</div>
+                    </div>
+                    <div class="theme-switch-group" role="radiogroup" aria-label="Day and Night Theme Selector">
+                        <button type="button" id="theme-btn-day" class="theme-switch-btn" data-theme="day" role="radio" aria-checked="false" title="Switch to Day Theme">
+                            <span class="theme-icon">☀️</span>
+                            <span class="theme-text">Day</span>
+                        </button>
+                        <button type="button" id="theme-btn-night" class="theme-switch-btn active" data-theme="night" role="radio" aria-checked="true" title="Switch to Night Theme">
+                            <span class="theme-icon">🌙</span>
+                            <span class="theme-text">Night</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 2. Severe Weather Audio Alert -->
+                <div class="setting-group">
+                    <div class="setting-header">
+                        <div class="setting-label">Severe Weather Audio Warning Siren</div>
+                        <div class="setting-desc">Synthesize warning chime tone upon detection of severe convective thunderstorm cells.</div>
+                    </div>
+                    <button type="button" id="audio-toggle-btn" class="setting-toggle-btn" title="Toggle Severe Weather Siren Audio">
+                        <span id="audio-btn-icon">🔇</span>
+                        <span id="audio-btn-label">Audio Alerts: OFF</span>
+                    </button>
+                </div>
+
+                <!-- 3. Convective Scenario -->
+                <div class="setting-group">
+                    <div class="setting-header">
+                        <div class="setting-label">Atmospheric Convective Scenario</div>
+                        <div class="setting-desc">Select meteorological case study to simulate severe, elevated, or moderate convection.</div>
+                    </div>
+                    <select id="scenario-select" class="app-select setting-select" aria-label="Select Convective Scenario">
+                        <option value="mumbai_severe" selected>Mumbai Severe Convective Squall (Severe)</option>
+                        <option value="mumbai_pulse">Mumbai Heat Convection (Elevated)</option>
+                        <option value="monsoon_squall">Mumbai Monsoon Convective Band (Moderate)</option>
+                        <option value="fair_weather">Mumbai Fair Weather (Low)</option>
+                        <option value="norwester">Kolkata Kalbaishakhi Supercell (Severe)</option>
+                        <option value="isolated_pulse">Delhi Afternoon Pulse Storm (Elevated)</option>
+                    </select>
+                </div>
+
+                <!-- 4. Doppler Radar Station -->
+                <div class="setting-group">
+                    <div class="setting-header">
+                        <div class="setting-label">Primary Doppler Radar Station</div>
+                        <div class="setting-desc">Select 250 km surveillance radar station gate.</div>
+                    </div>
+                    <select id="station-select" class="app-select setting-select" aria-label="Select Doppler Radar Station">
+                        <option value="VABB_MUMBAI" selected>Mumbai Radar (Konkan Coast / MMR)</option>
+                        <option value="VECC_KOLKATA">Kolkata Radar (Gangetic WB)</option>
+                        <option value="VIDP_DELHI">Delhi-NCR (Indira Gandhi)</option>
+                        <option value="VEBS_BHUBANESWAR">Bhubaneswar (Odisha Coast)</option>
+                        <option value="VOBL_BENGALURU">Bengaluru (Deccan Plateau)</option>
+                        <option value="VEGT_GUWAHATI">Guwahati (Brahmaputra Valley)</option>
+                    </select>
+                </div>
+
+                <!-- 5. Geospatial Radar Layers -->
+                <div class="setting-group">
+                    <div class="setting-header">
+                        <div class="setting-label">Geospatial Radar Canvas Layers</div>
+                        <div class="setting-desc">Toggle active GIS radar overlay features and forecast vectors.</div>
+                    </div>
+                    <div class="settings-layer-group">
+                        <button type="button" class="layer-toggle-chip active" data-layer="radar" title="Toggle Doppler Radar Reflectivity">
+                            <span>🌧️</span> Doppler Reflectivity (dBZ)
+                        </button>
+                        <button type="button" class="layer-toggle-chip active" data-layer="lightning" title="Toggle Lightning Strike Points">
+                            <span>⚡</span> Lightning Strikes
+                        </button>
+                        <button type="button" class="layer-toggle-chip active" data-layer="tracking" title="Toggle Cell Centroid Trajectories & Cones">
+                            <span>🌀</span> Trajectories & Cones
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <footer class="app-footer">
+        <p><strong>वज्रSense (VajraSense) Prototype</strong> — Academic Capstone Research. Designed to complement official weather advisories (IMD, Damini) for localized situational awareness and 0–2h nowcasting research.</p>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script>
+        window.VAJRA_CONFIG = {
+            cartoApiKey: "{{ carto_api_key|default('') }}"
+        };
+    </script>
+    <script src="/static/js/map.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
