@@ -39,6 +39,17 @@ ml_model = ThunderstormMLModel()
 nowcasting_engine = NowcastingEngine(fuzzy_engine, ml_model)
 
 
+@app.route("/health", methods=["GET"])
+@app.route("/api/health", methods=["GET"])
+def health_check():
+    return jsonify({
+        "status": "healthy",
+        "service": "vajrasense-nowcaster",
+        "version": "1.0.0",
+        "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat()
+    }), 200
+
+
 @app.route("/")
 def index():
     return render_template("index.html", carto_api_key=CARTO_API_KEY)
@@ -424,4 +435,7 @@ def get_model_info():
 
 
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=5000, debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    host = os.environ.get("HOST", "0.0.0.0")
+    debug = os.environ.get("FLASK_DEBUG", "0").lower() in ("1", "true")
+    app.run(host=host, port=port, debug=debug)

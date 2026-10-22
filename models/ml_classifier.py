@@ -136,7 +136,8 @@ class ThunderstormMLModel:
 
     def predict_risk(self, feature_dict: Dict[str, float]) -> Dict[str, Any]:
         row = [feature_dict.get(feat, 0.0) for feat in FEATURE_NAMES]
-        probs = self.model.predict_proba([row])[0]
+        X_df = pd.DataFrame([row], columns=FEATURE_NAMES)
+        probs = self.model.predict_proba(X_df)[0]
         class_idx = int(np.argmax(probs))
         pred_label = SEVERITY_CLASSES[class_idx]
 
