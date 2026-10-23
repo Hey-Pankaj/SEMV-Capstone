@@ -1,11 +1,10 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "wsgi.py",
-      "use": "@vercel/python"
+  "functions": {
+    "api/index.py": {
+      "includeFiles": "{templates/**,static/**,models/**,models_saved/**,pipeline/**,vajrasense/**}"
     }
-  ],
+  },
   "routes": [
     {
       "src": "/static/(.*)",
@@ -13,7 +12,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "wsgi.py"
+      "dest": "/api/index.py"
     }
   ]
 }

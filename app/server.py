@@ -9,7 +9,7 @@ import sys
 import json
 import urllib.request
 import datetime
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, send_from_directory
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if ROOT_DIR not in sys.path:
@@ -27,10 +27,16 @@ from models.evaluation import get_benchmark_evaluation
 app = Flask(
     __name__,
     template_folder=os.path.join(ROOT_DIR, "templates"),
-    static_folder=os.path.join(ROOT_DIR, "static")
+    static_folder=os.path.join(ROOT_DIR, "static"),
+    static_url_path="/static"
 )
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
+
+
+@app.route("/static/<path:filename>")
+def serve_static(filename):
+    return send_from_directory(os.path.join(ROOT_DIR, "static"), filename)
 
 from vajrasense.config import CARTO_API_KEY
 

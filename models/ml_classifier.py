@@ -121,11 +121,14 @@ class ThunderstormMLModel:
         self.model = clf
         self.feature_importances = sorted_importances
 
-        joblib.dump({
-            "model": self.model,
-            "feature_importances": self.feature_importances,
-            "accuracy": acc
-        }, MODEL_PATH)
+        try:
+            joblib.dump({
+                "model": self.model,
+                "feature_importances": self.feature_importances,
+                "accuracy": acc
+            }, MODEL_PATH)
+        except Exception:
+            pass
 
         return {
             "accuracy": round(acc, 4),

@@ -1451,7 +1451,7 @@ body,
   content: '';
   position: absolute;
   inset: 0;
-  background-image: url('/static/img/mumbai_thunderstorm_bg.jpg');
+  background-image: url('../img/mumbai_thunderstorm_bg.jpg');
   background-position: center 25%;
   background-size: cover;
   background-repeat: no-repeat;
